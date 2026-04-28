@@ -288,6 +288,8 @@ function abrirModalConfig() {
       set("config-janela-estabilizacao", config.janelaLeituraEstabilizacao);
       set("config-variacao-estabilizacao", config.variacaoEstabilizacaoPa);
       set("config-timeout-estabilizacao", config.timeoutEstabilizacao);
+      set("config-tempo-pulso-solenoide", config.tempoPulsoSolenoideEstabilizacao ?? 0.15);
+      set("config-intervalo-pulso-solenoide", config.intervaloPulsoSolenoideEstabilizacao ?? 0.15);
       set("config-tempo-esvaziamento", config.tempoEsvaziamentoCilindro);
       set("config-casas-decimais", config.casasDecimaisDisplay);
       set("config-tempo-offset", config.tempoCalculoOffset);
@@ -325,6 +327,8 @@ function salvarConfiguracoes() {
     janelaLeituraEstabilizacao: int("config-janela-estabilizacao"),
     variacaoEstabilizacaoPa: num("config-variacao-estabilizacao"),
     timeoutEstabilizacao: int("config-timeout-estabilizacao"),
+    tempoPulsoSolenoideEstabilizacao: num("config-tempo-pulso-solenoide"),
+    intervaloPulsoSolenoideEstabilizacao: num("config-intervalo-pulso-solenoide"),
     tempoEsvaziamentoCilindro: num("config-tempo-esvaziamento"),
     casasDecimaisDisplay: int("config-casas-decimais"),
     tempoCalculoOffset: num("config-tempo-offset")
