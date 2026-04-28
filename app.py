@@ -92,6 +92,21 @@ def aguardar_estabilizacao_pressao(automacao_cancelada):
 
         pressao = ler_pressao_segura()
         agora = time.time()
+
+        if pressao > pressao_max:
+            registrar_feedback(
+                f"Pressão acima da faixa ({pressao:.1f} Pa). Aplicando pulso rápido na solenóide.",
+                "warning"
+            )
+            abrir_solenoide()
+            time.sleep(tempo_pulso_solenoide_s)
+            fechar_solenoide()
+            # Descarta histórico para garantir que a janela de estabilização
+            # considere somente leituras após a pressão entrar na faixa.
+            leituras = []
+            time.sleep(intervalo_pulso_solenoide_s)
+            continue
+
         leituras.append((agora, pressao))
 
         if pressao > pressao_max:
