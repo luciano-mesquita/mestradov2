@@ -69,6 +69,8 @@ def aguardar_estabilizacao_pressao(automacao_cancelada):
     janela_s = max(1, int(float(config.get("janelaLeituraEstabilizacao", 5))))
     variacao_pa = float(config.get("variacaoEstabilizacaoPa", 5))
     timeout_s = max(1, int(float(config.get("timeoutEstabilizacao", 30))))
+    tempo_pulso_solenoide_s = max(0.05, float(config.get("tempoPulsoSolenoideEstabilizacao", 0.15)))
+    intervalo_pulso_solenoide_s = max(0.05, float(config.get("intervaloPulsoSolenoideEstabilizacao", 0.15)))
 
     registrar_feedback(
         f"Aguardando estabilização ({pressao_min:.1f}–{pressao_max:.1f} Pa, janela {janela_s}s, variação ≤ {variacao_pa:.1f} Pa).",
@@ -90,6 +92,21 @@ def aguardar_estabilizacao_pressao(automacao_cancelada):
 
         pressao = ler_pressao_segura()
         agora = time.time()
+
+        if pressao > pressao_max:
+            registrar_feedback(
+                f"Pressão acima da faixa ({pressao:.1f} Pa). Aplicando pulso rápido na solenóide.",
+                "warning"
+            )
+            abrir_solenoide()
+            time.sleep(tempo_pulso_solenoide_s)
+            fechar_solenoide()
+            # Descarta histórico para garantir que a janela de estabilização
+            # considere somente leituras após a pressão entrar na faixa.
+            leituras = []
+            time.sleep(intervalo_pulso_solenoide_s)
+            continue
+
         leituras.append((agora, pressao))
 
         limite_tempo = agora - janela_s
@@ -562,6 +579,8 @@ def carregar_config():
     config.setdefault("janelaLeituraEstabilizacao", 5)
     config.setdefault("variacaoEstabilizacaoPa", 5)
     config.setdefault("timeoutEstabilizacao", 30)
+    config.setdefault("tempoPulsoSolenoideEstabilizacao", 0.15)
+    config.setdefault("intervaloPulsoSolenoideEstabilizacao", 0.15)
     config.setdefault("modoCompressorCalibracao", "intervalado")
     config.setdefault("tempoIntervaloCompressor", 0.3)
     config.setdefault("tempoEsvaziamentoCilindro", 5)
