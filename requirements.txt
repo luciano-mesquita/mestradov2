@@ -1,0 +1,6 @@
+adafruit_blinka==8.65.0
+adafruit_circuitpython_ads1x15==2.4.4
+board==1.0
+Flask==3.1.2
+odfpy==1.4.1
+scipy==1.16.2

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatórios</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        .card {
+            background-color: #fff;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            padding: 25px 30px;
+            max-width: 1000px;
+            margin: 30px auto;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            color: #0057d9;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .tabela-wrapper {
+            overflow-x: auto;
+            margin-top: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        table thead {
+            background-color: #eef4ff;
+        }
+
+        table th, table td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        table td {
+            background-color: #fff;
+        }
+
+        .btn-voltar {
+            margin-top: 20px;
+            background-color: #ccc;
+            color: #222;
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-voltar:hover {
+            background-color: #aaa;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Relatórios de Medição</h2>
+
+    <label for="seletor-planilha">Escolha uma planilha:</label>
+    <select id="seletor-planilha" onchange="carregarAbas()">
+        <option value="">-- selecione --</option>
+        {% for arquivo in arquivos %}
+        <option value="{{ arquivo }}">{{ arquivo }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="seletor-aba">Escolha a aba:</label>
+    <select id="seletor-aba" onchange="carregarDados()">
+        <option value="">-- selecione uma aba --</option>
+    </select>
+
+    <div class="tabela-wrapper">
+        <table id="tabela-dados">
+            <!-- Dados serão inseridos dinamicamente -->
+        </table>
+    </div>
+
+    <button class="btn-voltar" onclick="window.location.href='/'">← Voltar ao Início</button>
+</div>
+
+<script>
+async function carregarAbas() {
+    const planilha = document.getElementById("seletor-planilha").value;
+    const abaSelect = document.getElementById("seletor-aba");
+    abaSelect.innerHTML = "<option>Carregando...</option>";
+
+    const res = await fetch(`/relatorios/abas/${planilha}`);
+    const abas = await res.json();
+
+    abaSelect.innerHTML = '<option value="">-- selecione uma aba --</option>';
+    abas.forEach(aba => {
+        const opt = document.createElement("option");
+        opt.value = aba;
+        opt.textContent = aba;
+        abaSelect.appendChild(opt);
+    });
+}
+
+async function carregarDados() {
+    const planilha = document.getElementById("seletor-planilha").value;
+    const aba = document.getElementById("seletor-aba").value;
+    const tabela = document.getElementById("tabela-dados");
+
+    const res = await fetch("/relatorios/dados", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ arquivo: planilha, aba })
+    });
+
+    const dados = await res.json();
+    tabela.innerHTML = "";
+
+    if (!dados || dados.length === 0) {
+        tabela.innerHTML = "<tr><td colspan='10'>Nenhum dado encontrado para esta aba.</td></tr>";
+        return;
+    }
+
+    // Cabeçalho
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    dados[0].forEach((_, i) => {
+        const th = document.createElement("th");
+        th.textContent = `Coluna ${i + 1}`;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    tabela.appendChild(thead);
+
+    // Corpo
+    const tbody = document.createElement("tbody");
+    dados.forEach(row => {
+        const tr = document.createElement("tr");
+        row.forEach(cell => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+    tabela.appendChild(tbody);
+}
+</script>
+
+</body>
+</html>

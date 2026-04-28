@@ -1,0 +1,21 @@
+{
+    "cilindroAr": 0.03135,
+    "alturaCilindro": 0.05,
+    "diametroCilindro": 0.05,
+    "pressaoAtmosferica": 95000,
+    "offset": 1.177679,
+    "v_fonte": 4.965,
+    "pressaoCalibracaoMaxima": 1400,
+    "pressaoInicialMedicao": 1050,
+    "pressaoFinalMedicao": 0,
+    "tempoEsvaziamentoCilindro": 10,
+    "casasDecimaisDisplay": 2,
+    "tempoCalculoOffset": 5,
+    "pressaoAutoMinima": 950,
+    "pressaoAutoMaxima": 1050,
+    "janelaLeituraEstabilizacao": 5,
+    "variacaoEstabilizacaoPa": 5,
+    "timeoutEstabilizacao": 300,
+    "modoCompressorCalibracao": "direto",
+    "tempoIntervaloCompressor": 0.2
+}
